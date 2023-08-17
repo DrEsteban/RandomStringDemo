@@ -18,7 +18,10 @@ The infrastructure will be deployed with a prebuilt image of the .NET applicatio
 
 ## TODOs
 
+This repo was created with simplicity of deployment in mind. A "production ready" solution would need additional improvements such as:
+
 * Deploy Web App and SQL server into a VNET and enable Private Links for DB communication. (Or otherwise refine the network strategies used as to not unnecessarily expose the DB)
+* Parameters allowing customization of SKUs, scale settings, etc.
 * Provide scripts, parameters, and infrastructure to enable building custom versions of the .NET application and host in a private Azure Container Registry.
     * Enables inner-loop development of the application
     * Increase organizational security by using private artifact hosts rather than public Docker Hub
