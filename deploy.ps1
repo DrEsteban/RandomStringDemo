@@ -45,4 +45,5 @@ $deploymentOutput = az deployment group create `
 $webAppPrincipalId = $($deploymentOutput | ConvertFrom-Json).properties.outputs.webAppPrincipalId.value
 
 # Add webAppPrincipalId to AAD group
+# Unfortunately, there isn't a way to do this using Bicep yet
 az ad group member add --group $SecurityGroupName --member-id $webAppPrincipalId
