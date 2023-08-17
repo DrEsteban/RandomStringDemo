@@ -8,11 +8,13 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   location: location
   kind: 'linux'
   sku: {
-    name: 'S1'
-    tier: 'Standard'
+    name: 'P1'
+    tier: 'PremiumV3'
   }
   properties: {
     reserved: true
+    elasticScaleEnabled: true
+    maximumElasticWorkerCount: 3 // Autoscale
   }
 }
 
@@ -29,44 +31,6 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
       linuxFxVersion: 'DOCKER|${dockerImage}'
       healthCheckPath: '/'
     }
-  }
-}
-
-resource autoScaleSettings 'Microsoft.Insights/autoscalesettings@2022-10-01' = {
-  name: '${webAppName}-autoscalesettings'
-  location: location
-  properties: {
-    profiles: [
-      {
-        name: 'Default'
-        capacity: {
-          minimum: '1'
-          maximum: '3'
-          default: '1'
-        }
-        rules: [
-          {
-            metricTrigger: {
-              metricName: 'CpuPercentage'
-              metricResourceUri: webApp.id
-              timeGrain: 'PT1M'
-              statistic: 'Average'
-              timeWindow: 'PT5M'
-              timeAggregation: 'Average'
-              operator: 'GreaterThan'
-              threshold: 80
-            }
-            scaleAction: {
-              direction: 'Increase'
-              type: 'ChangeCount'
-              value: '1'
-              cooldown: 'PT5M'
-            }
-          }
-        ]
-      }
-    ]
-    targetResourceUri: webApp.id
   }
 }
 
