@@ -1,5 +1,5 @@
-param dockerImage string
-param webAppName string
+param dockerImage string = 'stevenry/stringfetcher:latest'
+param webAppName string = 'myWebApp'
 param location string = resourceGroup().location
 param fqdn string = ''
 param vnetName string = '${webAppName}-vnet'
@@ -67,10 +67,10 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
   }
   properties: {
     serverFarmId: appServicePlan.id
+    httpsOnly:true
     siteConfig: {
       linuxFxVersion: 'DOCKER|${dockerImage}'
       alwaysOn:true
-      httpsOnly:true
       appSettings:[
         {
           name:'SQL_CONNECTION_STRING'
@@ -97,19 +97,20 @@ resource appServiceCertificate 'Microsoft.Web/certificates@2021-02-01' = {
   }
 }
 
-resource sqlServer 'Microsoft.Sql/servers@2021-03-01-preview' = {
+resource sqlServer 'Microsoft.Sql/servers@2022-11-01-preview' = {
   name:'${webAppName}-sqlserver'
   location:location
   properties:{
     administratorLoginPassword:''
     publicNetworkAccess:'Disabled'
     version:'12.0'
-    azureADOnlyAuthentication:true
+    //azureADOnlyAuthentication:true
   }
 }
 
-resource sqlDb 'Microsoft.Sql/servers/databases@2021-03-01-preview' = {
-  name:'${sqlServer.name}/${webAppName}-sqldb'
+resource sqlDb 'Microsoft.Sql/servers/databases@2022-11-01-preview' = {
+  parent: sqlServer
+  name:'${webAppName}-sqldb'
   location:location
 }
 
@@ -118,11 +119,13 @@ resource aadGroup 'Microsoft.AAD/groups@2020-10-01-preview' = {
 }
 
 resource aadGroupMember 'Microsoft.AAD/groups/members@2020-10-01-preview' = {
-  name:'${aadGroup.name}/${webApp.identity.principalId}'
+  parent: aadGroup
+  name: '${webApp.identity.principalId}'
 }
 
 resource sqlAdmin 'Microsoft.Sql/servers/administrators@2021-03-01-preview' = {
-  name:'${sqlServer.name}/ActiveDirectory'
+  parent: sqlServer
+  name:'ActiveDirectory'
   properties:{
     administratorType:'ActiveDirectory'
     login:aadGroup.properties.displayName
@@ -159,7 +162,8 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
 }
 
 resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-02-01' = {
-  name:'${privateEndpoint.name}/default'
+  parent: privateEndpoint
+  name:'default'
   properties:{
     privateDnsZoneConfigs:[
       {
@@ -204,6 +208,7 @@ resource vpnConnection 'Microsoft.Network/connections@2021-02-01' = {
     sharedKey:'sharedkey1234'
     virtualNetworkGateway1:{
       id:vpnGateway.id
+      properties: {}
     }
   }
 }
