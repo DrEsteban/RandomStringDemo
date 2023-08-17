@@ -4,7 +4,7 @@ using StringFetcher.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<StringsDbContext>(options => options.UseSqlServer(builder.Configuration["AZURE_SQL_CONNECTIONSTRING"]));
+builder.Services.AddDbContext<StringsDbContext>(contextOptions => contextOptions.UseSqlServer(builder.Configuration["AZURE_SQL_CONNECTIONSTRING"], sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
 var app = builder.Build();
 
