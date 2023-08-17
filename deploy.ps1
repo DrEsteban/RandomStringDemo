@@ -6,7 +6,7 @@ param (
   [string]$ResourceGroupName,
 
   [Parameter()]
-  [string]$Location = "westus3",
+  [string]$Location = "westus",
 
   [Parameter()]
   [string]$SecurityGroupName = "mySecurityGroup"

@@ -8,8 +8,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   location: location
   kind: 'linux'
   sku: {
-    name: 'P1'
-    tier: 'PremiumV3'
+    name: 'P0V3' // Premium SKU required to use elastic autoscaling
   }
   properties: {
     reserved: true
