@@ -19,6 +19,7 @@ public class StringsDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Seed data
         var entries = Enumerable.Range(1, 50).Select(i => new StringEntry(i, $"This is random string #{i}"));
         modelBuilder.Entity<StringEntry>().HasData(entries);
     }
